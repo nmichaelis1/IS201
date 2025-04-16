@@ -1,0 +1,215 @@
+<!-- Nathan Michaelis -->
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Wordle en Español</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f9f9f9;
+      text-align: center;
+      padding: 20px;
+    }
+
+    h1 {
+      margin-bottom: 10px;
+    }
+
+    #board {
+      display: grid;
+      grid-template-columns: repeat(5, 60px);
+      gap: 10px;
+      justify-content: center;
+      margin: 20px 0;
+      min-height: 390px;
+    }
+
+    .tile {
+      width: 60px;
+      height: 60px;
+      border: 2px solid #ccc;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      text-transform: uppercase;
+      font-weight: bold;
+      background-color: white;
+    }
+
+    .correct { background-color: #6aaa64; color: white; border-color: #6aaa64; }
+    .present { background-color: #c9b458; color: white; border-color: #c9b458; }
+    .absent  { background-color: #787c7e; color: white; border-color: #787c7e; }
+
+    .keyboard {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      max-width: 400px;
+      margin: 10px auto;
+    }
+
+    .key {
+      width: 40px;
+      height: 50px;
+      margin: 5px;
+      font-size: 18px;
+      font-weight: bold;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      background-color: #ddd;
+    }
+
+    .key:active {
+      transform: scale(0.95);
+    }
+
+    .key.wide {
+      width: 80px;
+    }
+
+    #message {
+      margin-top: 15px;
+      font-size: 18px;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <h1>Wordle en Español</h1>
+  <p>Adivina la palabra de 5 letras</p>
+
+  <div id="board"></div>
+  <div class="keyboard" id="keyboard"></div>
+
+  <div id="message"></div>
+
+  <script>
+    const wordList = [
+        "salud", "perro", "niñez", "ratón", "héroe", "túnel", "avión", "cafés",
+        "árbol", "piñas", "menús", "niños", "muros", "ojera", "dulce",
+        "playa", "llave", "duelo", "sueño", "pasar", "miedo", "hojas", "luzco", "ojera", "limón"
+    ];
+  
+    const secretWord = wordList[Math.floor(Math.random() * wordList.length)];
+    const maxAttempts = 6;
+    let currentGuess = "";
+    let currentAttempt = 0;
+    let gameOver = false;
+    const pastGuesses = [];
+  
+    const board = document.getElementById("board");
+    const message = document.getElementById("message");
+    const keyboard = document.getElementById("keyboard");
+  
+    function createKeyboard() {
+      const rows = [
+        "QWERTYUIOP".split(""),
+        "ASDFGHJKLÑ".split(""),
+        ["⌫", "Z", "X", "C", "V", "B", "N", "M", "Á", "É", "Í", "Ó", "Ú", "Ü", "⏎"]
+      ];
+  
+      rows.forEach(row => {
+        row.forEach(key => {
+          const btn = document.createElement("button");
+          btn.textContent = key;
+          btn.className = "key" + (["⏎", "⌫"].includes(key) ? " wide" : "");
+          btn.onclick = () => handleKey(key);
+          keyboard.appendChild(btn);
+        });
+      });
+    }
+  
+    function handleKey(key) {
+        if (gameOver) return;
+
+        if (key === "⌫") {
+            currentGuess = currentGuess.slice(0, -1);
+            updateBoard();
+            message.textContent = ""; // Clear error if user types again
+        } else if (key === "⏎") {
+            submitGuess();
+        } else if (currentGuess.length < 5) {
+            currentGuess += key.toLowerCase();
+            updateBoard();
+            message.textContent = ""; // Clear error if user types again
+        }
+    }
+  
+    function updateBoard() {
+      board.innerHTML = "";
+  
+      // Show all previous guesses
+      pastGuesses.forEach(guess => {
+        for (let i = 0; i < 5; i++) {
+          const tile = document.createElement("div");
+          tile.className = "tile";
+          const letter = guess.word[i];
+          tile.textContent = letter;
+  
+          if (letter === secretWord[i]) {
+            tile.classList.add("correct");
+          } else if (secretWord.includes(letter)) {
+            tile.classList.add("present");
+          } else {
+            tile.classList.add("absent");
+          }
+  
+          board.appendChild(tile);
+        }
+      });
+  
+      // Show current input row
+      if (currentAttempt < maxAttempts && message.textContent === "") {
+        for (let i = 0; i < 5; i++) {
+          const tile = document.createElement("div");
+          tile.className = "tile";
+          tile.textContent = currentGuess[i] ? currentGuess[i] : "";
+          board.appendChild(tile);
+        }
+      }
+    }
+  
+    function submitGuess() {
+        if (currentGuess.length !== 5) {
+            message.textContent = "La palabra debe tener 5 letras.";
+            updateBoard();
+            return;
+        }
+
+        if (!wordList.includes(currentGuess)) {
+            message.textContent = "Palabra no válida.";
+            updateBoard();
+            return;
+        }
+
+        pastGuesses.push({ word: currentGuess });
+        currentAttempt++;
+
+        if (currentGuess === secretWord) {
+            message.textContent = "¡Correcto! 🎉";
+            gameOver = true;
+            endGame();
+        } else if (currentAttempt === maxAttempts) {
+            message.textContent = `Fin del juego. La palabra era: ${secretWord.toUpperCase()}`;
+            gameOver = true;
+            endGame();
+        }
+
+        currentGuess = "";
+        updateBoard();
+    }
+  
+    function endGame() {
+      Array.from(document.querySelectorAll(".key")).forEach(btn => btn.disabled = true);
+    }
+  
+    // Init
+    createKeyboard();
+    updateBoard();
+  </script>
+</body>
+</html>

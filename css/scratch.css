@@ -1,0 +1,70 @@
+/* Nathan Michaelis, 4/15/2025 */
+
+body {
+    background-color: #f9f9f9;
+    font-family: Verdana, Geneva, Tahoma, sans-serif;
+    color: #1c3545;
+    font-size: 17px;
+}
+
+a {
+    color: #f9f9f9;
+    text-decoration: none;
+}
+
+a:hover {
+    font-weight: bold;
+    color: #fce183;
+}
+
+.bold {
+    font-weight: bold;
+}
+
+.common {
+    position: absolute;
+}
+
+.header {
+    top: 0px;
+    left: 0px;
+    right: 0px;
+    height: 45px;
+    padding-top: 15px;
+    text-align: center;
+    background-color: #1c3545;
+    color: white;
+}
+
+.mainbody {
+    top: 64px;
+    bottom: 39px;
+    left: 114px;
+    right: 114px;
+}
+
+.centered {
+    display: flex;
+    justify-content: center;
+    margin: 20px 0;
+}
+
+.tableauStyle {
+    width: 1700px;
+    height: 1027px;
+    transform: scale(0.7);
+    transform-origin: top center;
+}
+
+.footer {
+    bottom: 0px;
+    height: 25px;
+    left: 0px;
+    right: 0px;
+    background-color: #1c3545;
+    color: #f9f9f9;
+    text-align: center;
+    padding-top: 15px;
+    font-size: 9px;
+    position: fixed;
+}
